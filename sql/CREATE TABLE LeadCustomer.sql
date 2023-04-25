@@ -1,0 +1,3 @@
+CREATE Table bookingdb.LeadCustomer (
+
+)

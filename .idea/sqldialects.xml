@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
-    <file url="file://$PROJECT_DIR$/sql/data-definition/CREATE TABLE LeadCustomer.sql" dialect="GenericSQL" />
-    <file url="file://$PROJECT_DIR$/sql/data-definition/CREATE TABLE Passenger.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql/data-definition/DLL build script.sql" dialect="GenericSQL" />
     <file url="file://$USER_HOME$/University/First Year/Modules/Database Systems 1/Formative SQL/create table booking.sql" dialect="GenericSQL" />
     <file url="file://$USER_HOME$/University/First Year/Modules/Database Systems 1/Formative SQL/create table customer.sql" dialect="GenericSQL" />
     <file url="PROJECT" dialect="PostgreSQL" />

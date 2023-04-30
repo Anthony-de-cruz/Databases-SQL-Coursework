@@ -12,7 +12,7 @@ INSERT INTO LeadCustomer (
                           surname,
                           billingaddress,
                           email)
-VALUES (123, 'Bob', 'Bobbington','1 Bob Street', 'bob@bob.com');
+VALUES (999, 'Bob', 'Bobbington','1 Bob Street', 'bob@bob.com');
 
 -- b
 INSERT INTO Passenger (
@@ -22,13 +22,13 @@ INSERT INTO Passenger (
                        passportno,
                        nationality,
                        dob)
-VALUES (5, 'Jim', 'Jimming', 'weee123', 'dog', '01-02-2000');
+VALUES (999, 'Jim', 'Jimming', 'pssprtno998', 'man', '01-02-2000');
 
 -- c
-INSERT INTO Flight (flightid,
-                    flightdate,
-                    origin,
-                    destination,
-                    maxcapacity,
-                    priceperseat)
-VALUES (200, CURRENT_TIMESTAMP, 'bed', 'car', 200, 60)
+INSERT INTO Flight(FlightID,
+                   FlightDate,
+                   Origin,
+                   Destination,
+                   MaxCapacity,
+                   PricePerSeat)
+VALUES (999, '01-01-2024 09:02', 'Place1', 'Place2', 200, 300)

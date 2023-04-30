@@ -3,7 +3,3 @@
 -- bookings. A customer that has only cancelled bookings could be removed; the
 -- associated bookings should also be removed along with all the seat bookings.
 
-CREATE PROCEDURE InsertFlightBooking
-    @CustomerID INTEGER,
-    @FlightID INTEGER,
-    @NumSeats INTEGER

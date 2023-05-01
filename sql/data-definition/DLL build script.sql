@@ -11,7 +11,7 @@ DROP TABLE IF EXISTS LeadCustomer;
 
 CREATE Table LeadCustomer
 (
-    CustomerId     INTEGER      NOT NULL,
+    CustomerID     INTEGER      NOT NULL,
     FirstName      VARCHAR(20)  NOT NULL,
     Surname        VARCHAR(40)  NOT NULL,
     BillingAddress VARCHAR(200) NOT NULL,
@@ -98,12 +98,20 @@ DECLARE
                             WHERE CheckFlightID = Flight.FlightID);
     BookedSeats INTEGER := (SELECT SUM(NumSeats)
                             FROM FlightBooking
-                            WHERE CheckFlightID = FlightBooking.FlightID);
+                            WHERE CheckFlightID = FlightBooking.FlightID
+                              AND FlightBooking.Status != 'C');
 BEGIN
     IF (BookedSeats IS NULL)
     THEN
-        BookedSeats = 0;
+        --RAISE EXCEPTION 'Flight does not exist.';
+        RETURN Capacity;
     END IF;
+
+    IF (Capacity - BookedSeats < 0)
+    THEN
+        RETURN 0;
+    END IF;
+
     RETURN Capacity - BookedSeats;
 END;
 $$;
@@ -119,8 +127,8 @@ $$
 BEGIN
 
     NEW.TotalCost = NEW.NumSeats * (SELECT PricePerSeat
-    FROM Flight
-    WHERE NEW.FlightID = Flight.FlightID);
+                                    FROM Flight
+                                    WHERE NEW.FlightID = Flight.FlightID);
     RETURN NEW;
 END;
 $$;

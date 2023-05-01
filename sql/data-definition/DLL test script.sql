@@ -56,7 +56,7 @@ INSERT INTO Flight(FlightID,
                    Destination,
                    MaxCapacity,
                    PricePerSeat)
-VALUES (1, '01-01-2044 09:02', 'Place1555', 'Place2', 200, 355);
+VALUES (1, '01-01-2044 09:02', 'Place1555', 'Place2', 220, 355);
 
 INSERT INTO Flight(FlightID,
                    FlightDate,
@@ -91,6 +91,16 @@ INSERT INTO FlightBooking(BookingID,
                           NumSeats)
 VALUES (4, 4, 1, 3);
 
+INSERT INTO FlightBooking(BookingID,
+                          CustomerID,
+                          FlightID,
+                          NumSeats)
+VALUES (5, 2, 1, 2);
+
+UPDATE FlightBooking
+SET Status = 'C'
+WHERE BookingID = 5;
+
 -- Test the deletion of customers
 DELETE FROM LeadCustomer WHERE CustomerID = 3;
 
@@ -99,4 +109,3 @@ SET Status = 'C'
 WHERE BookingID = 4;
 
 DELETE FROM LeadCustomer WHERE CustomerID = 4;
-

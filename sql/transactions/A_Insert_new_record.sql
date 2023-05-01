@@ -31,4 +31,4 @@ INSERT INTO Flight(FlightID,
                    Destination,
                    MaxCapacity,
                    PricePerSeat)
-VALUES (999, '01-01-2024 09:02', 'Place1', 'Place2', 200, 300)
+VALUES (999, '01-01-2024 09:02', 'Place1', 'Place2', 150, 300)

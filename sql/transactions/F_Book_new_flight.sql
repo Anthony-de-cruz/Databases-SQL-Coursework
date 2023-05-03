@@ -7,6 +7,37 @@
 -- The making of a booking with all the steps outlined should work as an atomic
 -- operation.
 
--- BEGIN TRANSACTION;
--- EXECUTE BookFlight(123, 50, 1, 2, [1, 2]);
--- COMMIT;
+CALL BookFlight(
+        222,
+        700,
+        2,
+        3,
+        ARRAY [1919,
+            2020, 2011]:: INTEGER[],
+        ARRAY ['20A',
+            '20B', '20C'],
+        ROW (700,
+            'Jonas',
+            'Jones',
+            '123 Big Rd',
+            'JJBIG@example.com')::LeadCustomer,
+        ARRAY [
+            ROW (1919,
+                'Bob',
+                'Dob',
+                'pass1231',
+                'Mars',
+                '1904-01-01')::passenger,
+            ROW (2020,
+                'Bobbin',
+                'Smithz',
+                'pssport123',
+                'yes',
+                '1920-01-01')::passenger,
+            ROW (2011,
+                'Cheese',
+                'Grilllz',
+                'pssport123123',
+                'Saturn',
+                '1999-01-01')::passenger
+            ]);

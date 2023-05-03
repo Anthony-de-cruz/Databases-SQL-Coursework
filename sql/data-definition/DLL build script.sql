@@ -108,7 +108,6 @@ BEGIN
 
     -- Create customer
     IF newCustomer IS NOT NULL THEN
-        RAISE NOTICE 'THIS IS BEING MADE';
         INSERT INTO LeadCustomer
         VALUES (newCustomer.CustomerID,
                 newCustomer.Firstname,
@@ -124,7 +123,6 @@ BEGIN
     -- Create new passengers
     FOREACH newPassenger IN ARRAY newPassengers
         LOOP
-            raise notice '%', newPassenger;
             INSERT INTO Passenger
             VALUES (newPassenger.PassengerID,
                     newPassenger.FirstName,
@@ -137,7 +135,6 @@ BEGIN
     -- Assign passenger seats
     FOR i IN array_lower(SeatNums, 1)..array_upper(SeatNums, 1)
         LOOP
-            RAISE NOTICE '%, %, %', newBookingID, PassengerIDs[i], i;
             INSERT INTO SeatBooking
             VALUES (newBookingID, PassengerIDs[i], SeatNums[i]);
         END LOOP;

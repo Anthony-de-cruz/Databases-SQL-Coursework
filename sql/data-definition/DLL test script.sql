@@ -102,10 +102,19 @@ SET Status = 'C'
 WHERE BookingID = 5;
 
 -- Test the deletion of customers
-DELETE FROM LeadCustomer WHERE CustomerID = 3;
+DELETE
+FROM LeadCustomer
+WHERE CustomerID = 3;
 
 UPDATE FlightBooking
 SET Status = 'C'
 WHERE BookingID = 4;
 
-DELETE FROM LeadCustomer WHERE CustomerID = 4;
+DELETE
+FROM LeadCustomer
+WHERE CustomerID = 4;
+
+INSERT INTO SeatBooking (Bookingid,
+                         PassengerID,
+                         SeatNumber)
+VALUES (1, 1, '1');

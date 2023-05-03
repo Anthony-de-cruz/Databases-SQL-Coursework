@@ -75,7 +75,6 @@ CREATE TABLE SeatBooking
     PassengerID INTEGER NOT NULL,
     SeatNumber  CHAR(4) NOT NULL,
     PRIMARY KEY (BookingID, PassengerID),
-    UNIQUE (SeatNumber),
     FOREIGN KEY (BookingID) REFERENCES FlightBooking (BookingID)
         ON DELETE CASCADE,
     FOREIGN KEY (PassengerID) REFERENCES Passenger (PassengerID)
@@ -83,6 +82,66 @@ CREATE TABLE SeatBooking
 );
 
 ------------------------- Create Routines ------------------------
+
+CREATE OR REPLACE PROCEDURE BookFlight(
+    IN newBookingID INTEGER,
+    IN newCustomerID INTEGER,
+    IN newFlightID INTEGER,
+    IN newNumSeats INTEGER,
+    IN PassengerIDs INTEGER[],
+    IN SeatNums CHAR(4)[],
+    IN newCustomer LeadCustomer DEFAULT NULL,
+    IN newPassengers Passenger[] DEFAULT NULL
+)
+    LANGUAGE plpgsql
+AS
+$$
+DECLARE
+    newPassenger Passenger;
+    num          CHAR(4);
+    index        INTEGER = 0;
+BEGIN
+    -- Check to see if the passenger num is correct
+    IF cardinality(PassengerIDs) > SeatNums THEN
+        RAISE EXCEPTION 'Cannot have more passengers than number of seats';
+    END IF;
+
+    -- Create customer
+    IF newCustomer IS NOT NULL THEN
+        INSERT INTO LeadCustomer
+        VALUES (newCustomer.CustomerID,
+                newCustomer.Firstname,
+                newCustomer.Surname,
+                newCustomer.BillingAddress,
+                newCustomer.email);
+    END IF;
+
+    -- Create booking
+    INSERT INTO FlightBooking
+    VALUES (newBookingID, newCustomerID, newFlightID, newNumSeats);
+
+    -- Create new passengers
+    FOREACH newPassenger IN ARRAY newPassengers
+        LOOP
+            raise notice '%', newPassenger;
+            INSERT INTO Passenger
+            VALUES (newPassenger[0],
+                    newPassenger[1],
+                    newPassenger[2],
+                    newPassenger[3],
+                    newPassenger[4],
+                    newPassenger[5]);
+        END LOOP;
+
+    -- Assign passenger seats
+    FOREACH num IN ARRAY SeatNums
+        LOOP
+            INSERT INTO SeatBooking
+            VALUES (newBookingID, PassengerIDs[index], num);
+            index := index + 1;
+        END LOOP;
+END;
+$$;
 
 CREATE OR REPLACE FUNCTION GetFlightSeatAvailability(
     -- Returns the number of seats available.
@@ -103,7 +162,6 @@ DECLARE
 BEGIN
     IF (BookedSeats IS NULL)
     THEN
-        --RAISE EXCEPTION 'Flight does not exist.';
         RETURN Capacity;
     END IF;
 
@@ -133,6 +191,8 @@ BEGIN
 END;
 $$;
 
+-- Exists to keep the flight booking total costs
+-- up to date (such as when you add a new passenger).
 CREATE TRIGGER UpdateFlightBookingCost
     BEFORE INSERT OR UPDATE
     ON FlightBooking
@@ -153,6 +213,7 @@ BEGIN
 END;
 $$;
 
+-- Exists to throw exception if there aren't enough seats.
 CREATE TRIGGER EnforceMaxCapacity
     BEFORE INSERT OR UPDATE
     ON FlightBooking
@@ -175,8 +236,63 @@ BEGIN
 END;
 $$;
 
+-- Exists to throw exception when
+-- deleting a customer with a reserved booking.
 CREATE TRIGGER RestrictCustomerDeletionTrigger
     BEFORE DELETE
     ON LeadCustomer
     FOR EACH ROW
 EXECUTE FUNCTION RestrictCustomerDeletion();
+
+CREATE OR REPLACE FUNCTION RestrictSeatBooking()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+AS
+$$
+DECLARE
+
+BEGIN
+    -- Check to see if the flight booking exists.
+    IF NOT EXISTS(SELECT 1
+                  FROM FlightBooking
+                  WHERE FlightBooking.BookingID = NEW.BookingID) THEN
+        RAISE EXCEPTION 'Cannot allocate seat for a booking that does not exist.';
+    END IF;
+    -- Check to see if the booking is not cancelled.
+    IF (SELECT Status
+        FROM FlightBooking
+        WHERE FlightBooking.BookingID = NEW.BookingID) = 'C' THEN
+        RAISE EXCEPTION 'Cannot allocate seat for a booking that is cancelled.';
+    END IF;
+    -- Check to see if there are seats left for the booking.
+    IF ((SELECT NumSeats
+         FROM FlightBooking
+         WHERE BookingID = NEW.BookingID) - (SELECT COUNT(BookingID)
+                                             FROM SeatBooking
+                                             WHERE BookingID = NEW.BookingID)
+           ) <= 0 THEN
+        RAISE EXCEPTION 'Cannot book seat as there are none available for this booking.';
+    END IF;
+    -- Check to see if the seat is taken.
+    IF EXISTS (SELECT
+               FROM SeatBooking
+                        JOIN FlightBooking
+                             ON SeatNumber = NEW.Seatnumber AND
+                                FlightBooking.Status = 'R') THEN
+        RAISE EXCEPTION 'Seat is already taken.';
+    END IF;
+
+    RETURN NEW;
+END;
+$$;
+
+-- Exists to throw exception when:
+-- 1. If the flight booking exists.
+-- 2. Check to see if the booking is not cancelled.
+-- 3. Check to see if there are seats left for the booking.
+-- 4. Check to see if the seat is taken.
+CREATE TRIGGER RestrictSeatBookingTrigger
+    BEFORE INSERT OR UPDATE
+    ON SeatBooking
+    FOR EACH ROW
+EXECUTE FUNCTION RestrictSeatBooking();

@@ -32,3 +32,9 @@ INSERT INTO Flight(FlightID,
                    MaxCapacity,
                    PricePerSeat)
 VALUES (999, '01-01-2024 09:02', 'Place1', 'Place2', 150, 300)
+
+
+INSERT INTO Seatbooking(BookingID,
+                        PassengerID,
+                        SeatNumber)
+VALUES (1, 1, '10')

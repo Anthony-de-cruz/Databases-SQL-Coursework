@@ -118,3 +118,34 @@ INSERT INTO SeatBooking (Bookingid,
                          PassengerID,
                          SeatNumber)
 VALUES (1, 1, '1');
+
+CALL BookFlight(
+        1144,
+        1,
+        1,
+        2,
+        ARRAY [1001,
+            1000]:: INTEGER[],
+        ARRAY ['1a69',
+            '11a'],
+        ROW (111,
+            'John',
+            'Doe',
+            '123 Main St',
+            'johndoe@example.com')::LeadCustomer,
+        ARRAY [
+            ROW (1000,
+                'Jane',
+                'Doe',
+                'passport1',
+                'world',
+                '1900-01-01')::passenger,
+            ROW (1001,
+                'Bob',
+                'Smith',
+                'pssport123',
+                'yes',
+                '1900-01-01')::passenger
+            ]);
+
+

@@ -1,6 +1,7 @@
 -- !PLpgSQL
 -- BUILD/REBUILD SCRIPT
 
+DROP PROCEDURE IF EXISTS BookFlight;
 DROP TABLE IF EXISTS SeatBooking;
 DROP TABLE IF EXISTS Passenger;
 DROP TABLE IF EXISTS FlightBooking;
@@ -99,15 +100,15 @@ $$
 DECLARE
     newPassenger Passenger;
     num          CHAR(4);
-    index        INTEGER = 0;
 BEGIN
     -- Check to see if the passenger num is correct
-    IF cardinality(PassengerIDs) > SeatNums THEN
+    IF cardinality(PassengerIDs) > cardinality(SeatNums) THEN
         RAISE EXCEPTION 'Cannot have more passengers than number of seats';
     END IF;
 
     -- Create customer
     IF newCustomer IS NOT NULL THEN
+        RAISE NOTICE 'THIS IS BEING MADE';
         INSERT INTO LeadCustomer
         VALUES (newCustomer.CustomerID,
                 newCustomer.Firstname,
@@ -125,20 +126,20 @@ BEGIN
         LOOP
             raise notice '%', newPassenger;
             INSERT INTO Passenger
-            VALUES (newPassenger[0],
-                    newPassenger[1],
-                    newPassenger[2],
-                    newPassenger[3],
-                    newPassenger[4],
-                    newPassenger[5]);
+            VALUES (newPassenger.PassengerID,
+                    newPassenger.FirstName,
+                    newPassenger.Surname,
+                    newPassenger.PassportNo,
+                    newPassenger.Nationality,
+                    newPassenger.Dob);
         END LOOP;
 
     -- Assign passenger seats
-    FOREACH num IN ARRAY SeatNums
+    FOR i IN array_lower(SeatNums, 1)..array_upper(SeatNums, 1)
         LOOP
+            RAISE NOTICE '%, %, %', newBookingID, PassengerIDs[i], i;
             INSERT INTO SeatBooking
-            VALUES (newBookingID, PassengerIDs[index], num);
-            index := index + 1;
+            VALUES (newBookingID, PassengerIDs[i], SeatNums[i]);
         END LOOP;
 END;
 $$;

@@ -82,6 +82,11 @@ CREATE TABLE SeatBooking
         ON DELETE RESTRICT
 );
 
+-------------------------- Create Views --------------------------
+
+CREATE VIEW CustomerView AS
+    SELECT
+
 ------------------------- Create Routines ------------------------
 
 CREATE OR REPLACE PROCEDURE BookFlight(

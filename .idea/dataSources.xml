@@ -4,6 +4,7 @@
     <data-source source="LOCAL" name="postgres@cmpstudb-01.cmp.uea.ac.uk" uuid="3fafa3c1-175d-49d6-9117-bfa5866f3ebb">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
+      <schema-control>AUTOMATIC</schema-control>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://cmpstudb-01.cmp.uea.ac.uk:5432/postgres</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>

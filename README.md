@@ -1,4 +1,4 @@
-# Databases-SQL-Courswork
+# Databases-SQL-Coursework
 
 TODO
 

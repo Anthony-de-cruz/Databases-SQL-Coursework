@@ -1,37 +1,21 @@
 -- A. Insert a new record. This could be
-    -- a. Given a lead customer ID number, name, and contact details, create a
-    -- new customer record.
-    -- b. Given a passenger with an ID, name, date of birth, etc., create a new
-    -- passenger record.
-    -- c. Given a flight ID number, origin, destination, flight date, capacity of the
-    -- aircraft, and price per seat create a new flight record.
+-- a. Given a lead customer ID number, name, and contact details, create a
+-- new customer record.
+-- b. Given a passenger with an ID, name, date of birth, etc., create a new
+-- passenger record.
+-- c. Given a flight ID number, origin, destination, flight date, capacity of the
+-- aircraft, and price per seat create a new flight record.
 -- a
-INSERT INTO LeadCustomer (
-                          customerid,
-                          firstname,
-                          surname,
-                          billingaddress,
-                          email)
-VALUES (999, 'Bob', 'Bobbington','1 Bob Street', 'bob@bob.com');
+INSERT INTO LeadCustomer
+VALUES (999, 'Bob', 'Bobbington', '1 Bob Street', 'bob@bob.com');
 
 -- b
-INSERT INTO Passenger (
-                       passengerid,
-                       firstname,
-                       surname,
-                       passportno,
-                       nationality,
-                       dob)
-VALUES (999, 'Jim', 'Jimming', 'pssprtno998', 'man', '01-02-2000');
+INSERT INTO Passenger
+VALUES (999, 'Jim', 'Jimming', 'pssprtno998', 'Pluto', '01-02-2000');
 
 -- c
-INSERT INTO Flight(FlightID,
-                   FlightDate,
-                   Origin,
-                   Destination,
-                   MaxCapacity,
-                   PricePerSeat)
-VALUES (999, '01-01-2024 09:02', 'Place1', 'Place2', 150, 300)
+INSERT INTO Flight
+VALUES (999, '01-01-2024 09:02', 'Place1', 'Place2', 150, 300);
 
 
 -- B. Given a customer ID number, remove the record for that customer. It should
@@ -39,14 +23,9 @@ VALUES (999, '01-01-2024 09:02', 'Place1', 'Place2', 150, 300)
 -- bookings. A customer that has only cancelled bookings could be removed; the
 -- associated bookings should also be removed along with all the seat bookings.
 
-INSERT INTO LeadCustomer(CustomerID,
-                         FirstName,
-                         Surname,
-                         BillingAddress,
-                         Email)
-VALUES (998, 'To', 'Be', 'Deleted.Rd', 'whoops@okay.com');
-
-DELETE FROM LeadCustomer WHERE (CustomerID = 988);
+DELETE
+FROM LeadCustomer
+WHERE (CustomerID = 988);
 
 
 -- C. Check the availability of seats on all flights by showing the flight ID number,
@@ -55,10 +34,10 @@ DELETE FROM LeadCustomer WHERE (CustomerID = 988);
 
 SELECT FlightID,
        FlightDate,
-       (SELECT SUM(NumSeats) AS BookedSeats
-        FROM FlightBooking
-        WHERE FlightBooking.FlightID = Flight.FlightID
-          AND Status = 'R'),
+       COALESCE((SELECT SUM(NumSeats)
+                 FROM FlightBooking
+                 WHERE FlightBooking.FlightID = Flight.FlightID
+                   AND Status = 'R'), 0)   AS BookedSeats,
        GetFlightSeatAvailability(FlightID) AS AvailableSeats,
        MaxCapacity
 FROM Flight;
@@ -67,12 +46,8 @@ FROM Flight;
 -- D. Given a flight ID number, check the status of all seats currently allocated to
 -- that flight, i.e., return the total number of reserved/ cancelled/ available seat.
 
-SELECT COUNT(Status) FILTER (WHERE Status = 'R') AS TotalReserved,
-       COUNT(Status) FILTER (WHERE Status = 'C') AS TotalCancelled,
-       GetFlightSeatAvailability(1)              AS TotalAvailable
-FROM SeatBooking
-         JOIN FlightBooking
-              ON SeatBooking.BookingID = FlightBooking.BookingID;
+SELECT *
+FROM GetFlightSeatingStatus(1);
 
 
 -- E. Produce a ranked list of all lead customers, showing their ID, their full name,
@@ -80,7 +55,7 @@ FROM SeatBooking
 -- The list should be sorted by decreasing total value.
 
 SELECT LeadCustomer.CustomerID,
-       FirstName || Surname AS FullName,
+       FirstName || ' ' || Surname AS FullName,
        TotalBooking,
        TotalSpend
 FROM LeadCustomer

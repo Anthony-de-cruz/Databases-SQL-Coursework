@@ -1,6 +1,5 @@
 -- !PLpgSQL
 -- BUILD/REBUILD SCRIPT
-
 DROP PROCEDURE IF EXISTS BookFlight;
 DROP TABLE IF EXISTS SeatBooking;
 DROP TABLE IF EXISTS Passenger;
@@ -35,7 +34,8 @@ CREATE TABLE Passenger
 CREATE TABLE Flight
 (
     FlightID     INTEGER     NOT NULL,
-    FlightDate   TIMESTAMP   NOT NULL,
+    FlightDate   TIMESTAMP   NOT NULL
+        CHECK (FlightDate > CURRENT_TIMESTAMP),
     Origin       VARCHAR(30) NOT NULL,
     Destination  VARCHAR(30) NOT NULL,
     MaxCapacity  INTEGER     NOT NULL
@@ -99,7 +99,6 @@ AS
 $$
 DECLARE
     newPassenger Passenger;
-    num          CHAR(4);
 BEGIN
     -- Check to see if the passenger num is correct
     IF cardinality(PassengerIDs) > cardinality(SeatNums) THEN
@@ -169,6 +168,35 @@ BEGIN
     END IF;
 
     RETURN Capacity - BookedSeats;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION GetFlightSeatingStatus(
+    IN CheckFlightID INTEGER
+)
+    RETURNS TABLE
+            (
+                TotalReserved  BIGINT,
+                TotalCancelled BIGINT,
+                TotalAvailable INTEGER
+            )
+    LANGUAGE plpgsql
+AS
+$$
+BEGIN
+    IF NOT EXISTS((SELECT FROM Flight WHERE FlightID = CheckFlightID)) THEN
+        RAISE EXCEPTION 'Flight % does not exist.', CheckFlightID;
+    END IF;
+
+    RETURN QUERY
+        SELECT COUNT(Status) FILTER (WHERE Status = 'R'
+            AND FlightID = CheckFlightID)               AS TotalReserved,
+               COUNT(Status) FILTER (WHERE Status = 'C'
+                   AND FlightID = CheckFlightID)        AS TotalCancelled,
+               GetFlightSeatAvailability(CheckFlightID) AS TotalAvailable
+        FROM SeatBooking
+                 JOIN FlightBooking
+                      ON SeatBooking.BookingID = FlightBooking.BookingID;
 END;
 $$;
 

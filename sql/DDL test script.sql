@@ -6,65 +6,32 @@ TRUNCATE Flight CASCADE;
 TRUNCATE LeadCustomer CASCADE;
 
 -- Test to see if records can be entered into the database
-INSERT INTO LeadCustomer (customerid,
-                          firstname,
-                          surname,
-                          billingaddress,
-                          email)
+INSERT INTO LeadCustomer
 VALUES (1, 'Bob', 'Bobbington', '1 Bob Street', 'bob@bob.com');
 
-INSERT INTO LeadCustomer (customerid,
-                          firstname,
-                          surname,
-                          billingaddress,
-                          email)
+INSERT INTO LeadCustomer
 VALUES (2, 'Firstname', 'Surname', '2 Bob Street', 'REEEE@bob.com');
 
-INSERT INTO LeadCustomer (customerid,
-                          firstname,
-                          surname,
-                          billingaddress,
-                          email)
+INSERT INTO LeadCustomer
 VALUES (3, 'I am', 'to be', 'deleted', 'with@no.reservation');
 
-INSERT INTO LeadCustomer (customerid,
-                          firstname,
-                          surname,
-                          billingaddress,
-                          email)
+INSERT INTO LeadCustomer
 VALUES (4, 'I am', 'to be', 'deleted', 'with@cancelled.reservation');
 
-INSERT INTO Passenger (passengerid,
-                       firstname,
-                       surname,
-                       passportno,
-                       nationality,
-                       dob)
+INSERT INTO LeadCustomer
+VALUES (998, 'To', 'Be', 'Deleted.Rd', 'whoops@okay.com');
+
+INSERT INTO Passenger
 VALUES (1, 'Don', 'Zibsz', 'pssprtno0', 'mane', '01-02-2001');
 
-INSERT INTO Passenger (passengerid,
-                       firstname,
-                       surname,
-                       passportno,
-                       nationality,
-                       dob)
+INSERT INTO Passenger
 VALUES (2, 'Jim', 'Jimming', 'pssprtno998', 'man', '01-02-2000');
 
-INSERT INTO Flight(FlightID,
-                   FlightDate,
-                   Origin,
-                   Destination,
-                   MaxCapacity,
-                   PricePerSeat)
+INSERT INTO Flight
 VALUES (1, '01-01-2044 09:02', 'Place1555', 'Place2', 220, 355);
 
-INSERT INTO Flight(FlightID,
-                   FlightDate,
-                   Origin,
-                   Destination,
-                   MaxCapacity,
-                   PricePerSeat)
-VALUES (2, '01-01-2044 09:02', 'Smol', 'Plane', 200, 8);
+INSERT INTO Flight
+VALUES (2, '01-01-2044 09:02', 'Smol', 'Plane', 200, 80);
 
 INSERT INTO FlightBooking(BookingID,
                           CustomerID,
@@ -119,6 +86,8 @@ INSERT INTO SeatBooking (Bookingid,
                          SeatNumber)
 VALUES (1, 1, '1');
 
+
+-- Test BookFlight()
 CALL BookFlight(
         1144,
         1,
@@ -147,5 +116,3 @@ CALL BookFlight(
                 'yes',
                 '1900-01-01')::passenger
             ]);
-
-
